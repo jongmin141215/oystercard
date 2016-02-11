@@ -19,26 +19,36 @@ describe Oystercard do
     expect(oystercard).not_to be_in_journey
   end
 
-  it 'can touch in' do
-    oystercard.top_up(20)
-    oystercard.touch_in
-    expect(oystercard).to be_in_journey
-  end
-
-  it 'can touch out' do
-    oystercard.top_up(20)
-    oystercard.touch_in
-    oystercard.touch_out
-    expect(oystercard).not_to be_in_journey
-  end
-
   it 'will not touch in if below minimum balance' do
-    expect{ oystercard.touch_in }.to raise_error 'Insufficient balance'
+    expect{ oystercard.touch_in('Aldgate') }.to raise_error 'Insufficient balance'
   end
 
-  it 'deducts money when touching out' do
-    oystercard.top_up(20)
-    oystercard.touch_in
-    expect{ oystercard.touch_out }.to change{ oystercard.balance }.by -Oystercard::MINIMUM_BALANCE
+
+  context '#touch_in' do
+    let(:station) { double :station }
+    before do
+      oystercard.top_up(20)
+      oystercard.touch_in(station)
+    end
+
+    it 'can touch in' do
+      expect(oystercard).to be_in_journey
+    end
+
+    it 'can touch out' do
+      oystercard.touch_out
+      expect(oystercard).not_to be_in_journey
+    end
+
+    it 'deducts money when touching out' do
+      expect{ oystercard.touch_out }.to change{ oystercard.balance }.by -Oystercard::MINIMUM_CHARGE
+    end
+
+    it 'stores the entry station' do
+      expect(oystercard.entry_station).to eq station
+    end
   end
+
+
+
 end
