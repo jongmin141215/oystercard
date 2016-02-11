@@ -6,7 +6,6 @@ describe Oystercard do
   end
 
   it 'can top up the balance' do
-    oystercard.top_up(10)
     expect{ oystercard.top_up 10 }.to change{ oystercard.balance }.by 10
   end
 
@@ -26,13 +25,19 @@ describe Oystercard do
   end
 
   it 'can touch in' do
+    oystercard.top_up(20)
     oystercard.touch_in
     expect(oystercard).to be_in_journey
   end
 
   it 'can touch out' do
+    oystercard.top_up(20)
     oystercard.touch_in
     oystercard.touch_out
     expect(oystercard).not_to be_in_journey
+  end
+
+  it 'raises an error if balance in insufficient' do
+    expect{ oystercard.touch_in }.to raise_error 'Insufficient balance'
   end
 end
