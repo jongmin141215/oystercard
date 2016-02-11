@@ -16,8 +16,23 @@ describe Oystercard do
     expect{ oystercard.top_up(1) }.to raise_error "Maximum balance of #{maximum_balance} exceeded"
   end
 
-  it 'deducts fare' do
+  it 'deducts an amount from the balance' do
     oystercard.top_up(20)
     expect{ oystercard.deduct(3) }.to change{ oystercard.balance }.by -3
+  end
+
+  it 'is initially not in a journey' do
+    expect(oystercard).not_to be_in_journey
+  end
+
+  it 'can touch in' do
+    oystercard.touch_in
+    expect(oystercard).to be_in_journey
+  end
+
+  it 'can touch out' do
+    oystercard.touch_in
+    oystercard.touch_out
+    expect(oystercard).not_to be_in_journey
   end
 end
