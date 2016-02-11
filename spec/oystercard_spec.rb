@@ -15,11 +15,6 @@ describe Oystercard do
     expect{ oystercard.top_up(1) }.to raise_error "Maximum balance of #{maximum_balance} exceeded"
   end
 
-  it 'deducts an amount from the balance' do
-    oystercard.top_up(20)
-    expect{ oystercard.deduct(3) }.to change{ oystercard.balance }.by -3
-  end
-
   it 'is initially not in a journey' do
     expect(oystercard).not_to be_in_journey
   end
@@ -37,7 +32,13 @@ describe Oystercard do
     expect(oystercard).not_to be_in_journey
   end
 
-  it 'raises an error if balance in insufficient' do
+  it 'will not touch in if below minimum balance' do
     expect{ oystercard.touch_in }.to raise_error 'Insufficient balance'
+  end
+
+  it 'deducts money when touching out' do
+    oystercard.top_up(20)
+    oystercard.touch_in
+    expect{ oystercard.touch_out }.to change{ oystercard.balance }.by -Oystercard::MINIMUM_BALANCE
   end
 end
